@@ -12,14 +12,17 @@ export interface SwapTransaction {
   amountIn: number;
   amountOut: number;
   timestamp: number;
+  isTopHolder?: boolean; // Flag for top 20 holders
 }
 
 export interface TokenFlow {
   tokenMint: string;
   tokenSymbol?: string;
   uniqueWallets: number;
+  topHolderCount?: number; // Number of top 20 holders who swapped
   totalSwaps: number;
   totalVolume: number;
+  weightedScore?: number; // Weighted score (top holders count 5x)
   recentSwaps: SwapTransaction[];
 }
 

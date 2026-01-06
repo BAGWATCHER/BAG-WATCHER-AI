@@ -28,8 +28,10 @@ export class AggregationService {
     // Group swaps by destination token
     const flowMap = new Map<string, {
       wallets: Set<string>;
+      topHolderWallets: Set<string>;
       swaps: typeof swaps;
       totalVolume: number;
+      weightedScore: number;
     }>();
 
     for (const swap of swaps) {
@@ -38,8 +40,10 @@ export class AggregationService {
       if (!flowMap.has(destToken)) {
         flowMap.set(destToken, {
           wallets: new Set(),
+          topHolderWallets: new Set(),
           swaps: [],
           totalVolume: 0,
+          weightedScore: 0,
         });
       }
 
@@ -47,6 +51,14 @@ export class AggregationService {
       flow.wallets.add(swap.wallet);
       flow.swaps.push(swap);
       flow.totalVolume += swap.amountOut;
+
+      // Track top holder separately and apply 5x weight
+      if (swap.isTopHolder) {
+        flow.topHolderWallets.add(swap.wallet);
+        flow.weightedScore += 5; // 5x weight for top holders
+      } else {
+        flow.weightedScore += 1; // 1x weight for regular holders
+      }
     }
 
     // Convert to TokenFlow array and fetch metadata
@@ -60,14 +72,16 @@ export class AggregationService {
         tokenMint,
         tokenSymbol: metadata.symbol,
         uniqueWallets: data.wallets.size,
+        topHolderCount: data.topHolderWallets.size,
         totalSwaps: data.swaps.length,
         totalVolume: data.totalVolume,
+        weightedScore: data.weightedScore,
         recentSwaps: data.swaps.slice(0, 5), // Include last 5 swaps
       });
     }
 
-    // Sort by number of unique wallets (strongest signal)
-    flows.sort((a, b) => b.uniqueWallets - a.uniqueWallets);
+    // Sort by weighted score (top holders count 5x more)
+    flows.sort((a, b) => b.weightedScore - a.weightedScore);
 
     return flows;
   }

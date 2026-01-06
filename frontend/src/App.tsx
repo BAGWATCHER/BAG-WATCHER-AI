@@ -253,12 +253,19 @@ function App() {
                 {flowsData?.flows && flowsData.flows.length > 0 ? (
                   <div className="flow-list">
                     {flowsData.flows.map((flow: TokenFlow, index: number) => (
-                      <div key={flow.tokenMint} className="flow-card">
+                      <div key={flow.tokenMint} className={`flow-card ${flow.topHolderCount && flow.topHolderCount > 0 ? 'has-top-holders' : ''}`}>
                         <div className="flow-header">
                           <div className="flow-token">
                             <div className="flow-rank">#{index + 1}</div>
                             <div className="flow-token-info">
-                              <h3>{flow.tokenSymbol || 'Unknown Token'}</h3>
+                              <h3>
+                                {flow.tokenSymbol || 'Unknown Token'}
+                                {flow.topHolderCount && flow.topHolderCount > 0 && (
+                                  <span className="top-holder-badge" title={`${flow.topHolderCount} top 20 holder${flow.topHolderCount > 1 ? 's' : ''} rotated here`}>
+                                    👑 {flow.topHolderCount}
+                                  </span>
+                                )}
+                              </h3>
                               <div className="token-address">
                                 {flow.tokenMint.slice(0, 8)}...{flow.tokenMint.slice(-8)}
                               </div>
@@ -304,8 +311,11 @@ function App() {
                   <h2>Recent Swaps</h2>
                   <div className="swaps-list">
                     {recentSwaps.map((swap) => (
-                      <div key={swap.signature} className="swap-row">
-                        <div className="swap-time">{formatTimestamp(swap.timestamp)}</div>
+                      <div key={swap.signature} className={`swap-row ${swap.isTopHolder ? 'top-holder-swap' : ''}`}>
+                        <div className="swap-time">
+                          {formatTimestamp(swap.timestamp)}
+                          {swap.isTopHolder && <span className="top-holder-indicator" title="Top 20 holder">👑</span>}
+                        </div>
                         <div className="swap-details">
                           <div className="swap-wallet mono">{shortenAddress(swap.wallet)}</div>
                           <div className="swap-arrow">→</div>

@@ -8,6 +8,8 @@ export class SwapServiceV2 {
   private swapCache: Map<string, SwapTransaction[]>; // tokenMint -> swaps
   private holderCache: Map<string, TokenHolder[]>; // tokenMint -> holders
   private webhookIds: Map<string, string>; // tokenMint -> webhookId
+  private vipWebhookIds: Map<string, string>; // tokenMint -> VIP webhook ID
+  private topHoldersCache: Map<string, Set<string>>; // tokenMint -> Set of top 20 holder addresses
 
   constructor(heliusService: HeliusService, webhookService: WebhookService) {
     this.heliusService = heliusService;
@@ -15,6 +17,8 @@ export class SwapServiceV2 {
     this.swapCache = new Map();
     this.holderCache = new Map();
     this.webhookIds = new Map();
+    this.vipWebhookIds = new Map();
+    this.topHoldersCache = new Map();
   }
 
   /**
@@ -32,6 +36,16 @@ export class SwapServiceV2 {
 
     // Cache holders
     this.holderCache.set(tokenMint, holders);
+
+    // Identify top 20 holders by balance
+    const top20Holders = new Set(
+      holders
+        .sort((a, b) => b.uiBalance - a.uiBalance)
+        .slice(0, 20)
+        .map(h => h.address)
+    );
+    this.topHoldersCache.set(tokenMint, top20Holders);
+    console.log(`Tracking top 20 holders with priority: ${top20Holders.size} wallets`);
 
     // Extract wallet addresses
     const addresses = holders.map(h => h.address);
@@ -171,6 +185,10 @@ export class SwapServiceV2 {
       return;
     }
 
+    // Check if this wallet is a top 20 holder
+    const topHolders = this.topHoldersCache.get(tokenMint) || new Set();
+    const isTopHolder = topHolders.has(wallet);
+
     // This is a memecoin -> memecoin swap!
     const swap: SwapTransaction = {
       signature: transaction.signature,
@@ -180,6 +198,7 @@ export class SwapServiceV2 {
       amountIn,
       amountOut,
       timestamp: transaction.timestamp,
+      isTopHolder, // Flag to indicate if from top 20
     };
 
     // Add to cache
@@ -198,8 +217,9 @@ export class SwapServiceV2 {
 
     this.swapCache.set(tokenMint, recentSwaps);
 
+    const holderLabel = isTopHolder ? '👑 TOP HOLDER' : '';
     console.log(
-      `🔥 NEW SWAP: ${wallet.slice(0, 8)}... swapped ${sourceToken.slice(0, 8)}... -> ${destinationToken.slice(0, 8)}...`
+      `🔥 NEW SWAP ${holderLabel}: ${wallet.slice(0, 8)}... swapped ${sourceToken.slice(0, 8)}... -> ${destinationToken.slice(0, 8)}...`
     );
     console.log(`Total swaps for ${tokenMint}: ${recentSwaps.length}`);
   }
