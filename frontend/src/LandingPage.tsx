@@ -1,16 +1,6 @@
-import { useState } from 'react';
 import './LandingPage.css';
 
 function LandingPage() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Add email to waitlist
-    console.log('Email submitted:', email);
-    setSubmitted(true);
-  };
 
   return (
     <div className="landing">

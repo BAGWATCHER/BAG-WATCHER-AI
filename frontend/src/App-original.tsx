@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { trackToken, getTokenFlows, TokenFlow, FlowsResponse } from './services/api';
+import { trackToken, getTokenFlows } from './services/api';
+import type { TokenFlow, FlowsResponse } from './services/api';
 
 function App() {
   const [tokenMint, setTokenMint] = useState('');
