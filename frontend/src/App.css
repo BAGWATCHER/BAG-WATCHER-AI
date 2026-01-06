@@ -6,20 +6,48 @@
 .header {
   text-align: center;
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.back-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #E74C4C;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.back-link:hover {
+  color: #C53030;
+}
+
+.header .logo {
+  width: 80px;
+  height: 80px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .header h1 {
-  font-size: 3rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #E74C4C 0%, #C53030 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  font-weight: 900;
 }
 
 .header p {
   color: #888;
   font-size: 1.1rem;
+  margin: 0;
 }
 
 .container {

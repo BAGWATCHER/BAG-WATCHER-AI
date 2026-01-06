@@ -104,8 +104,10 @@ function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>Trench Maps</h1>
-        <p>Track where memecoin holders are rotating their capital</p>
+        <a href="/" className="back-link">← Back to Home</a>
+        <img src="/skull-logo.png" alt="Bag Watcher AI" className="logo" />
+        <h1>Bag Watcher AI</h1>
+        <p>Real-time vamp detection for your bags</p>
       </div>
 
       <div className="container">
